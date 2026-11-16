@@ -235,8 +235,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-    }
 
+        fun cancel() {
+            try {
+                serverSocket?.close()
+            } catch (_: IOException) {
+            }
+        }    
+    }
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(receiver)
