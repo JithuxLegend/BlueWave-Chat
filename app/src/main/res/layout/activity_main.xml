@@ -3,39 +3,123 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_cosmic_gradient"
-    android:gravity="center"
     android:orientation="vertical"
-    android:padding="28dp">
+    android:padding="20dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="BLUEWAVE"
-        android:textColor="#60A5FA"
-        android:textSize="32sp"
-        android:textStyle="bold"
-        android:letterSpacing="0.15" />
-
-    <TextView
-        android:id="@+id/statusText"
-        android:layout_width="wrap_content"
+    <!-- Top Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:gravity="center"
-        android:text="Offline Bluetooth Mesh &amp; Voice Ready"
-        android:textColor="#94A3B8"
-        android:textSize="15sp" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/btnCheckPermissions"
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:letterSpacing="0.1"
+            android:text="BLUEWAVE"
+            android:textColor="#60A5FA"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/connectionBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#172554"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:text="Offline Radar"
+            android:textColor="#93C5FD"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Center Radar Hub -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_marginTop="36dp"
-        android:backgroundTint="#2563EB"
-        android:text="Grant Bluetooth &amp; Mic Access"
-        android:textAllCaps="false"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/radarPulse"
+            android:layout_width="130dp"
+            android:layout_height="130dp"
+            android:background="@drawable/bg_radar_circle">
+
+            <TextView
+                android:id="@+id/radarIconText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="SCAN"
+                android:textColor="#60A5FA"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/statusSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Tap Radar to discover nearby BlueWave phones"
+            android:textColor="#94A3B8"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnScan"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="#2563EB"
+                android:text="Scan Nearby"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:id="@+id/btnVisible"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="#1E293B"
+                android:text="Make Visible"
+                android:textAllCaps="false"
+                android:textColor="#93C5FD" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Nearby Devices Section -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="10dp"
+        android:text="NEARBY DEVICES (10–30M)"
+        android:textColor="#64748B"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <ListView
+        android:id="@+id/deviceListView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp" />
 
 </LinearLayout>
-      
+            
