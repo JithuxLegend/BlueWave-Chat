@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Deep Space Black Base -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#060911" />
+        </shape>
+    </item>
+    <!-- Top Midnight Blue Nebula Glow -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="650dp"
+                android:centerX="0.5"
+                android:centerY="0.12"
+                android:startColor="#1E3A8A"
+                android:centerColor="#0F172A"
+                android:endColor="#00060911" />
+        </shape>
+    </item>
+</layer-list>
