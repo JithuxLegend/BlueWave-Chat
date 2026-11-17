@@ -295,4 +295,39 @@ class MainActivity : AppCompatActivity() {
         }
         acceptThread?.cancel()
     }
+        inner class DeviceListAdapter(
+        context: Context,
+        private val devices: List<BluetoothDevice>
+    ) : android.widget.ArrayAdapter<BluetoothDevice>(context, 0, devices) {
+
+        @SuppressLint("MissingPermission")
+        override fun getView(position: Int, convertView: View?, parent: android.view.ViewGroup): View {
+            val row = convertView ?: android.widget.LinearLayout(context).apply {
+                orientation = android.widget.LinearLayout.VERTICAL
+                setBackgroundResource(R.drawable.bg_white_pill)
+                setPadding(44, 34, 44, 34)
+            }
+
+            val container = row as android.widget.LinearLayout
+            container.removeAllViews()
+
+            val device = devices[position]
+            val title = TextView(context).apply {
+                text = device.name ?: "Unknown BlueWave Peer"
+                textSize = 16f
+                setTypeface(null, android.graphics.Typeface.BOLD)
+                setTextColor(0xFF0F172A.toInt())
+            }
+            val subtitle = TextView(context).apply {
+                text = "Tap to connect offline  •  ${device.address}"
+                textSize = 12f
+                setTextColor(0xFF64748B.toInt())
+                setPadding(0, 6, 0, 0)
+            }
+
+            container.addView(title)
+            container.addView(subtitle)
+            return container
+        }
+    }   
 }
