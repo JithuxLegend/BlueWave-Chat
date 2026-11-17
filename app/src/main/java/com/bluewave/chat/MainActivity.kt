@@ -204,14 +204,18 @@ class MainActivity : AppCompatActivity() {
         }.start()
     }
 
-    @SuppressLint("MissingPermission")
+        @SuppressLint("MissingPermission")
     private fun onConnectedSuccess(socket: BluetoothSocket) {
         val peerName = socket.remoteDevice.name ?: "BlueWave Peer"
         connectionBadge.text = "Connected: $peerName"
         connectionBadge.setBackgroundColor(0xFF1E3A8A.toInt())
-        statusSubtitle.text = "Secure Bluetooth pipe established! Ready for Phase 3 Chat."
-        Toast.makeText(this, "Connected to $peerName!", Toast.LENGTH_LONG).show()
+        statusSubtitle.text = "Opening encrypted Bluetooth chat..."
+
+        ChatActivity.activeSocket = socket
+        val intent = Intent(this, ChatActivity::class.java)
+        startActivity(intent)
     }
+    
 
     @SuppressLint("MissingPermission")
     private inner class AcceptThread : Thread() {
