@@ -1,100 +1,171 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_cosmic_gradient"
-    android:orientation="vertical">
+    android:background="@drawable/bg_pastel_mesh">
 
-    <!-- Top Chat Header -->
-    <LinearLayout
+    <!-- Top Frosted Peer Header -->
+    <RelativeLayout
+        android:id="@+id/chatTopBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#0B1120"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="14dp">
+        android:layout_height="68dp"
+        android:background="#E6FFFFFF"
+        android:elevation="4dp"
+        android:paddingHorizontal="14dp">
+
+        <TextView
+            android:id="@+id/backButton"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:text="‹"
+            android:textColor="#0F172A"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/peerAvatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="4dp"
+            android:layout_toEndOf="@id/backButton"
+            android:background="@drawable/bg_white_pill"
+            android:padding="4dp"
+            android:src="@drawable/shark_icon" />
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/peerAvatar"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/chatPeerName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Connected Peer"
-                android:textColor="#F8FAFC"
-                android:textSize="18sp"
+                android:text="BlueWave Peer"
+                android:textColor="#0F172A"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/chatStatus"
+                android:id="@+id/chatPeerStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Bluetooth Direct • Hold message to delete"
-                android:textColor="#60A5FA"
+                android:text="Active (Nearby Offline)"
+                android:textColor="#64748B"
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btnVoiceCall"
+        <TextView
+            android:id="@+id/bluetoothHeaderBadge"
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:backgroundTint="#1E3A8A"
-            android:text="Call"
-            android:textAllCaps="false"
-            android:textColor="#93C5FD"
-            android:textSize="13sp" />
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/bg_white_pill"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="5dp"
+            android:text="ᛒ ıll"
+            android:textColor="#2563EB"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
 
     <!-- Chat Messages List -->
-    <ListView
-        android:id="@+id/chatListView"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/messagesRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
-        android:paddingVertical="8dp"
-        android:stackFromBottom="true"
-        android:transcriptMode="alwaysScroll" />
+        android:layout_height="match_parent"
+        android:layout_above="@+id/signalStrengthPill"
+        android:layout_below="@id/chatTopBar"
+        android:clipToPadding="false"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp" />
 
-    <!-- Bottom Input Bar -->
-    <LinearLayout
-        android:layout_width="match_parent"
+    <!-- Signal Strength Pill -->
+    <TextView
+        android:id="@+id/signalStrengthPill"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#0B1120"
+        android:layout_above="@+id/chatBottomBar"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/bg_white_pill"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="5dp"
+        android:text="Signal Strength  ıll"
+        android:textColor="#475569"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+
+    <!-- Bottom Input Bar (Camera, Message..., Paperclip, Send Circle) -->
+    <LinearLayout
+        android:id="@+id/chatBottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:layout_alignParentBottom="true"
+        android:background="#F5FFFFFF"
+        android:elevation="8dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:paddingHorizontal="12dp">
 
-        <EditText
-            android:id="@+id/inputMessage"
+        <TextView
+            android:id="@+id/cameraButton"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/bg_white_pill"
+            android:gravity="center"
+            android:text="📷"
+            android:textSize="16sp" />
+
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="46dp"
+            android:layout_height="44dp"
+            android:layout_marginHorizontal="8dp"
             android:layout_weight="1"
-            android:background="@drawable/bg_bubble_received"
-            android:hint="Message via Bluetooth..."
-            android:inputType="textCapSentences|textMultiLine"
-            android:paddingHorizontal="16dp"
-            android:textColor="#F8FAFC"
-            android:textColorHint="#64748B"
-            android:textSize="15sp" />
+            android:background="@drawable/bg_white_pill"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="14dp">
+
+            <EditText
+                android:id="@+id/messageInput"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:hint="Message..."
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLines="3"
+                android:textColor="#0F172A"
+                android:textColorHint="#94A3B8"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/attachButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:gravity="center"
+                android:text="📎"
+                android:textSize="16sp" />
+        </LinearLayout>
 
         <Button
-            android:id="@+id/btnSend"
-            android:layout_width="wrap_content"
-            android:layout_height="46dp"
-            android:layout_marginStart="8dp"
-            android:backgroundTint="#2563EB"
-            android:text="Send"
-            android:textAllCaps="false"
+            android:id="@+id/sendButton"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@drawable/bg_send_circle"
+            android:text="➤"
             android:textColor="#FFFFFF"
-            android:textStyle="bold" />
+            android:textSize="16sp" />
     </LinearLayout>
 
-</LinearLayout>
-      
+</RelativeLayout>
+            
