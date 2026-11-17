@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/messageContainer"
+    android:id="@+id/messageRowContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingHorizontal="12dp"
-    android:paddingVertical="4dp">
+    android:paddingHorizontal="14dp"
+    android:paddingVertical="5dp">
 
     <LinearLayout
-        android:id="@+id/bubbleLayout"
+        android:id="@+id/bubbleContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_bubble_sent"
         android:maxWidth="280dp"
+        android:background="@drawable/bg_sent_pastel"
         android:orientation="vertical"
-        android:paddingHorizontal="14dp"
+        android:paddingHorizontal="16dp"
         android:paddingVertical="10dp">
 
         <TextView
             android:id="@+id/messageText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Message content"
-            android:textColor="#F8FAFC"
+            android:text="Message text"
+            android:textColor="#0F172A"
             android:textSize="15sp" />
 
         <TextView
@@ -31,9 +31,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginTop="4dp"
-            android:text="12:00 AM"
-            android:textColor="#93C5FD"
+            android:text="10:41"
+            android:textColor="#64748B"
             android:textSize="10sp" />
     </LinearLayout>
 
 </LinearLayout>
+            
