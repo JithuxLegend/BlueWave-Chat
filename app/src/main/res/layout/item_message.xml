@@ -14,8 +14,31 @@
         android:maxWidth="280dp"
         android:background="@drawable/bg_sent_pastel"
         android:orientation="vertical"
-        android:paddingHorizontal="16dp"
+        android:paddingHorizontal="14dp"
         android:paddingVertical="10dp">
+
+        <ImageView
+            android:id="@+id/messageImage"
+            android:layout_width="220dp"
+            android:layout_height="180dp"
+            android:layout_marginBottom="6dp"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/mediaAttachmentPill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:background="@drawable/bg_white_pill"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:text="▶  Play Media"
+            android:textColor="#0F172A"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/messageText"
@@ -37,4 +60,4 @@
     </LinearLayout>
 
 </LinearLayout>
-        
+            
