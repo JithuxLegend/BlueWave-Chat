@@ -11,26 +11,24 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.view.animation.AlphaAnimation
-import android.view.animation.Animation
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ListView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import java.io.IOException
 import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        val APP_UUID: UUID = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66")
-        const val APP_NAME = "BlueWaveChat"
+        val APP_UUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
+        const val SERVICE_NAME = "BlueWaveChat"
     }
 
     private var bluetoothAdapter: BluetoothAdapter? = null
@@ -39,8 +37,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var connectionBadge: TextView
     private lateinit var statusSubtitle: TextView
-    private lateinit var radarPulse: FrameLayout
-    private lateinit var radarIconText: TextView
+    private lateinit var connectedCountText: TextView
+    private lateinit var emptyChatsHint: TextView
 
     private var acceptThread: AcceptThread? = null
 
@@ -71,48 +69,81 @@ class MainActivity : AppCompatActivity() {
                         if (!it.name.isNullOrEmpty() && discoveredDevices.none { d -> d.address == it.address }) {
                             discoveredDevices.add(it)
                             deviceAdapter.notifyDataSetChanged()
+                            updatePeerCounts()
                         }
                     }
                 }
                 BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
-                    radarPulse.clearAnimation()
-                    radarIconText.text = "SCAN"
-                    statusSubtitle.text = "Found ${discoveredDevices.size} device(s). Tap to connect."
+                    statusSubtitle.text = if (discoveredDevices.isEmpty()) {
+                        "No nearby peers found. Tap Broadcast Signal to retry."
+                    } else {
+                        "Tap any peer above to start offline chat"
+                    }
                 }
             }
         }
     }
 
+    @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val btManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        bluetoothAdapter = btManager.adapter
+        val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        bluetoothAdapter = bluetoothManager.adapter
 
+        // Tab containers (Page A = Chats, Page B = Radar, Page C = Settings)
+        val pageChats = findViewById<View>(R.id.pageChatsContainer)
+        val pageRadar = findViewById<View>(R.id.pageRadarContainer)
+        val pageSettings = findViewById<View>(R.id.pageSettingsContainer)
+
+        val tabRadar = findViewById<TextView>(R.id.tabRadarBtn)
+        val tabChats = findViewById<TextView>(R.id.tabChatsBtn)
+        val tabSettings = findViewById<TextView>(R.id.tabSettingsBtn)
+        val quickScanLink = findViewById<TextView>(R.id.quickScanLink)
+
+        fun showTab(tabIndex: Int) {
+            pageRadar.visibility = if (tabIndex == 0) View.VISIBLE else View.GONE
+            pageChats.visibility = if (tabIndex == 1) View.VISIBLE else View.GONE
+            pageSettings.visibility = if (tabIndex == 2) View.VISIBLE else View.GONE
+
+            tabRadar.setTextColor(if (tabIndex == 0) 0xFF0F172A.toInt() else 0xFF94A3B8.toInt())
+            tabChats.setTextColor(if (tabIndex == 1) 0xFF0F172A.toInt() else 0xFF94A3B8.toInt())
+            tabSettings.setTextColor(if (tabIndex == 2) 0xFF0F172A.toInt() else 0xFF94A3B8.toInt())
+        }
+
+        // Open Page A (Chats) first
+        showTab(1)
+
+        tabRadar.setOnClickListener { showTab(0) }
+        tabChats.setOnClickListener { showTab(1) }
+        tabSettings.setOnClickListener { showTab(2) }
+        quickScanLink.setOnClickListener { showTab(0) }
+
+        // UI bindings
         connectionBadge = findViewById(R.id.connectionBadge)
         statusSubtitle = findViewById(R.id.statusSubtitle)
-        radarPulse = findViewById(R.id.radarPulse)
-        radarIconText = findViewById(R.id.radarIconText)
+        connectedCountText = findViewById(R.id.connectedCountText)
+        emptyChatsHint = findViewById(R.id.emptyChatsHint)
 
-        val listView = findViewById<ListView>(R.id.deviceListView)
+        val scanButton = findViewById<Button>(R.id.scanButton)
+        val deviceListView = findViewById<ListView>(R.id.deviceListView)
+        val recentChatsListView = findViewById<ListView>(R.id.recentChatsListView)
+
         deviceAdapter = DeviceListAdapter(this, discoveredDevices)
-        listView.adapter = deviceAdapter
+        deviceListView.adapter = deviceAdapter
+        recentChatsListView.adapter = deviceAdapter
 
-        listView.setOnItemClickListener { _, _, position, _ ->
-            connectToDevice(discoveredDevices[position])
+        deviceListView.setOnItemClickListener { _, _, position, _ ->
+            connectToPeer(discoveredDevices[position])
         }
 
-        findViewById<Button>(R.id.btnScan).setOnClickListener {
-            checkPermissionsAndRun { startBluetoothScan() }
+        recentChatsListView.setOnItemClickListener { _, _, position, _ ->
+            connectToPeer(discoveredDevices[position])
         }
 
-        radarPulse.setOnClickListener {
-            checkPermissionsAndRun { startBluetoothScan() }
-        }
-
-        findViewById<Button>(R.id.btnVisible).setOnClickListener {
-            checkPermissionsAndRun { makeDeviceDiscoverable() }
+        scanButton.setOnClickListener {
+            requestBluetoothPermissionsAndStart()
         }
 
         val filter = IntentFilter().apply {
@@ -121,73 +152,74 @@ class MainActivity : AppCompatActivity() {
         }
         registerReceiver(receiver, filter)
 
-        checkPermissionsAndRun {
-            startListeningServer()
-        }
+        requestBluetoothPermissionsAndStart()
     }
 
-    private fun checkPermissionsAndRun(action: () -> Unit) {
-        val needed = mutableListOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.RECORD_AUDIO
-        )
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            needed.add(Manifest.permission.BLUETOOTH_SCAN)
-            needed.add(Manifest.permission.BLUETOOTH_CONNECT)
-            needed.add(Manifest.permission.BLUETOOTH_ADVERTISE)
+    private fun updatePeerCounts() {
+        val count = discoveredDevices.size
+        connectedCountText.text = if (count == 0) {
+            "●  Ready for Offline Peers"
+        } else {
+            "●  $count Nearby Peer${if (count == 1) "" else "s"} Found"
         }
-        val missing = needed.filter {
-            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
-        }
-        if (missing.isEmpty()) action() else permissionLauncher.launch(missing.toTypedArray())
+        emptyChatsHint.visibility = if (count == 0) View.VISIBLE else View.GONE
     }
 
-    @SuppressLint("MissingPermission")
-    private fun makeDeviceDiscoverable() {
-        val discoverableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
-            putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
+    private fun requestBluetoothPermissionsAndStart() {
+        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            arrayOf(
+                Manifest.permission.BLUETOOTH_SCAN,
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.BLUETOOTH_ADVERTISE,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        } else {
+            arrayOf(
+                Manifest.permission.BLUETOOTH,
+                Manifest.permission.BLUETOOTH_ADMIN,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
         }
-        startActivity(discoverableIntent)
+        permissionLauncher.launch(permissions)
     }
 
     @SuppressLint("MissingPermission")
     private fun startBluetoothScan() {
-        if (bluetoothAdapter?.isEnabled == false) {
-            Toast.makeText(this, "Please turn ON Bluetooth first!", Toast.LENGTH_SHORT).show()
+        val adapter = bluetoothAdapter ?: return
+        if (!adapter.isEnabled) {
+            statusSubtitle.text = "Please turn on Bluetooth"
             return
         }
+
         discoveredDevices.clear()
-        bluetoothAdapter?.bondedDevices?.forEach { discoveredDevices.add(it) }
+        adapter.bondedDevices?.forEach { device ->
+            if (!device.name.isNullOrEmpty()) {
+                discoveredDevices.add(device)
+            }
+        }
         deviceAdapter.notifyDataSetChanged()
+        updatePeerCounts()
 
-        if (bluetoothAdapter?.isDiscovering == true) {
-            bluetoothAdapter?.cancelDiscovery()
+        if (adapter.isDiscovering) {
+            adapter.cancelDiscovery()
         }
-        bluetoothAdapter?.startDiscovery()
-
-        radarIconText.text = "LIVE"
-        statusSubtitle.text = "Scanning airwaves within 30m..."
-        val pulse = AlphaAnimation(1.0f, 0.35f).apply {
-            duration = 700
-            repeatMode = Animation.REVERSE
-            repeatCount = Animation.INFINITE
-        }
-        radarPulse.startAnimation(pulse)
+        adapter.startDiscovery()
+        statusSubtitle.text = "Scanning for peers..."
+        connectionBadge.text = "SCANNING"
     }
 
     @SuppressLint("MissingPermission")
     private fun startListeningServer() {
-        if (acceptThread == null) {
-            acceptThread = AcceptThread()
-            acceptThread?.start()
-        }
+        acceptThread?.cancel()
+        acceptThread = AcceptThread()
+        acceptThread?.start()
     }
 
     @SuppressLint("MissingPermission")
-    private fun connectToDevice(device: BluetoothDevice) {
+    private fun connectToPeer(device: BluetoothDevice) {
         bluetoothAdapter?.cancelDiscovery()
-        radarPulse.clearAnimation()
-        statusSubtitle.text = "Connecting to ${device.name}..."
+        statusSubtitle.text = "Connecting to ${device.name ?: "Peer"}..."
+        connectionBadge.text = "CONNECTING"
 
         Thread {
             try {
@@ -198,13 +230,14 @@ class MainActivity : AppCompatActivity() {
                 }
             } catch (e: IOException) {
                 runOnUiThread {
-                    statusSubtitle.text = "Connection failed. Make sure BlueWave is open on ${device.name}."
+                    statusSubtitle.text = "Connection failed. Make sure peer has BlueWave open."
+                    connectionBadge.text = "OFFLINE READY"
                 }
             }
         }.start()
     }
 
-        @SuppressLint("MissingPermission")
+    @SuppressLint("MissingPermission")
     private fun onConnectedSuccess(socket: BluetoothSocket) {
         val peerName = socket.remoteDevice.name ?: "BlueWave Peer"
         connectionBadge.text = "Connected: $peerName"
@@ -215,12 +248,13 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, ChatActivity::class.java)
         startActivity(intent)
     }
-    
 
     @SuppressLint("MissingPermission")
     private inner class AcceptThread : Thread() {
-        private val serverSocket: BluetoothServerSocket? by lazy(LazyThreadSafetyMode.NONE) {
-            bluetoothAdapter?.listenUsingRfcommWithServiceRecord(APP_NAME, APP_UUID)
+        private val serverSocket: BluetoothServerSocket? = try {
+            bluetoothAdapter?.listenUsingRfcommWithServiceRecord(SERVICE_NAME, APP_UUID)
+        } catch (e: IOException) {
+            null
         }
 
         override fun run() {
@@ -232,9 +266,14 @@ class MainActivity : AppCompatActivity() {
                     shouldLoop = false
                     null
                 }
-                socket?.also {
-                    runOnUiThread { onConnectedSuccess(it) }
-                    serverSocket?.close()
+                socket?.let {
+                    runOnUiThread {
+                        onConnectedSuccess(it)
+                    }
+                    try {
+                        serverSocket?.close()
+                    } catch (_: IOException) {
+                    }
                     shouldLoop = false
                 }
             }
@@ -245,24 +284,15 @@ class MainActivity : AppCompatActivity() {
                 serverSocket?.close()
             } catch (_: IOException) {
             }
-        }    
+        }
     }
+
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(receiver)
-        acceptThread?.cancel()
-    }
-
-    private class DeviceListAdapter(context: Context, private val devices: List<BluetoothDevice>) :
-        ArrayAdapter<BluetoothDevice>(context, 0, devices) {
-
-        @SuppressLint("MissingPermission")
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_device, parent, false)
-            val device = devices[position]
-            view.findViewById<TextView>(R.id.deviceName).text = device.name ?: "Unnamed Device"
-            view.findViewById<TextView>(R.id.deviceAddress).text = device.address
-            return view
+        try {
+            unregisterReceiver(receiver)
+        } catch (_: IllegalArgumentException) {
         }
+        acceptThread?.cancel()
     }
 }
