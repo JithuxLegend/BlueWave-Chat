@@ -41,6 +41,20 @@
             android:visibility="gone" />
 
         <TextView
+            android:id="@+id/saveToGalleryBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:background="@drawable/bg_black_pill"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:text="⬇ Save to Gallery"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <TextView
             android:id="@+id/messageText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
