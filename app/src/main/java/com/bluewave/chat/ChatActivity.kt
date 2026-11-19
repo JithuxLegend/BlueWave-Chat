@@ -3,6 +3,8 @@ package com.bluewave.chat
 import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothSocket
+import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -12,6 +14,10 @@ import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.os.Handler
+import android.os.Looper
+import android.provider.MediaStore
 import android.util.Base64
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -33,6 +39,7 @@ import androidx.recyclerview.widget.RecyclerView
 import java.io.BufferedReader
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStreamReader
@@ -54,7 +61,7 @@ class ChatActivity : AppCompatActivity() {
         val text: String,
         val time: String,
         val isSentByMe: Boolean,
-        val mediaType: String = "TEXT", // TEXT, IMAGE, AUDIO, VIDEO
+        val mediaType: String = "TEXT",
         val localFilePath: String? = null
     )
 
@@ -73,14 +80,13 @@ class ChatActivity : AppCompatActivity() {
     private var audioFile: File? = null
     private var isRecordingAudio = false
     private var activeMediaPlayer: MediaPlayer? = null
+    private val timerHandler = Handler(Looper.getMainLooper())
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { perms ->
-        if (perms.values.all { it }) {
-            Toast.makeText(this, "Permissions granted! Tap the button again.", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "Camera/Microphone permission needed for media", Toast.LENGTH_SHORT).show()
+        if (!perms.values.all { it }) {
+            Toast.makeText(this, "Camera/Microphone permission needed", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -110,6 +116,15 @@ class ChatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
+        val prefs = getSharedPreferences("bluewave_prefs", Context.MODE_PRIVATE)
+        val wall = prefs.getString("chat_wallpaper", "PASTEL") ?: "PASTEL"
+        val rootView = findViewById<View>(android.R.id.content)
+        when (wall) {
+            "OCEAN" -> rootView.setBackgroundColor(0xFFE0F2FE.toInt())
+            "DARK" -> rootView.setBackgroundColor(0xFF0F172A.toInt())
+            else -> rootView.setBackgroundResource(R.drawable.bg_pastel_mesh)
+        }
+
         val backButton = findViewById<TextView>(R.id.backButton)
         val chatPeerName = findViewById<TextView>(R.id.chatPeerName)
         chatPeerStatus = findViewById(R.id.chatPeerStatus)
@@ -126,8 +141,9 @@ class ChatActivity : AppCompatActivity() {
             return
         }
 
-        chatPeerName.text = socket.remoteDevice.name ?: "BlueWave Peer"
-        chatPeerStatus.text = "Active (Nearby Offline)"
+        val channel = prefs.getString("media_channel", "BT") ?: "BT"
+        chatPeerName.text = socket.remoteDevice.name ?: "Chat Peer"
+        chatPeerStatus.text = if (channel == "BT") "Active • Offline Bluetooth" else "Active • Hybrid Mode"
 
         chatAdapter = ChatAdapter(messages)
         messagesRecyclerView.layoutManager = LinearLayoutManager(this).apply {
@@ -135,9 +151,7 @@ class ChatActivity : AppCompatActivity() {
         }
         messagesRecyclerView.adapter = chatAdapter
 
-        backButton.setOnClickListener {
-            closeConnectionAndExit()
-        }
+        backButton.setOnClickListener { closeConnectionAndExit() }
 
         sendButton.setOnClickListener {
             val text = messageInput.text.toString().trim()
@@ -147,9 +161,7 @@ class ChatActivity : AppCompatActivity() {
             }
         }
 
-        cameraButton.setOnClickListener {
-            launchCameraCapture()
-        }
+        cameraButton.setOnClickListener { launchCameraCapture() }
 
         attachButton.setOnClickListener {
             if (isRecordingAudio) {
@@ -160,6 +172,53 @@ class ChatActivity : AppCompatActivity() {
         }
 
         setupStreamsAndListen(socket)
+    }
+
+    private fun scheduleAutoDeleteIfEnabled(msgId: String) {
+        val prefs = getSharedPreferences("bluewave_prefs", Context.MODE_PRIVATE)
+        val delayMs = when (prefs.getString("auto_delete_timer", "OFF")) {
+            "1H" -> 3600_000L
+            "24H" -> 86400_000L
+            else -> 0L
+        }
+        if (delayMs > 0L) {
+            timerHandler.postDelayed({ removeMessageById(msgId) }, delayMs)
+        }
+    }
+
+    private fun saveMediaFileToPublicGallery(msg: ChatMessage) {
+        val path = msg.localFilePath ?: return
+        val sourceFile = File(path)
+        if (!sourceFile.exists()) return
+
+        try {
+            val isVideo = msg.mediaType == "VIDEO"
+            val fileName = "Chat_${System.currentTimeMillis()}.${if (isVideo) "mp4" else "jpg"}"
+            val mimeType = if (isVideo) "video/mp4" else "image/jpeg"
+
+            val values = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    put(
+                        MediaStore.MediaColumns.RELATIVE_PATH,
+                        if (isVideo) Environment.DIRECTORY_MOVIES else Environment.DIRECTORY_PICTURES
+                    )
+                }
+            }
+            val collection = if (isVideo) {
+                MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+            } else {
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            }
+            val uri = contentResolver.insert(collection, values) ?: return
+            contentResolver.openOutputStream(uri)?.use { out ->
+                FileInputStream(sourceFile).use { input -> input.copyTo(out) }
+            }
+            Toast.makeText(this, "Saved to Gallery!", Toast.LENGTH_SHORT).show()
+        } catch (_: Exception) {
+            Toast.makeText(this, "Could not save to gallery", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setupStreamsAndListen(socket: BluetoothSocket) {
@@ -203,6 +262,7 @@ class ChatActivity : AppCompatActivity() {
         sendRawLine("TEXT|$msgId|$safeText")
 
         messages.add(ChatMessage(msgId, text, time, isSentByMe = true, mediaType = "TEXT"))
+        scheduleAutoDeleteIfEnabled(msgId)
         refreshChatList()
     }
 
@@ -229,7 +289,7 @@ class ChatActivity : AppCompatActivity() {
             "🎤  Record Voice Note"
         )
         AlertDialog.Builder(this)
-            .setTitle("Share Offline via Bluetooth")
+            .setTitle("Share Media")
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> pickImageLauncher.launch("image/*")
@@ -247,7 +307,6 @@ class ChatActivity : AppCompatActivity() {
             FileOutputStream(tempFile).use { out -> inputStream.copyTo(out) }
             sendCompressedImageFile(tempFile)
         } catch (_: Exception) {
-            Toast.makeText(this, "Could not load photo", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -276,21 +335,12 @@ class ChatActivity : AppCompatActivity() {
 
                 runOnUiThread {
                     messages.add(
-                        ChatMessage(
-                            id = msgId,
-                            text = "Photo",
-                            time = currentTimeString(),
-                            isSentByMe = true,
-                            mediaType = "IMAGE",
-                            localFilePath = savedFile.absolutePath
-                        )
+                        ChatMessage(msgId, "Photo", currentTimeString(), true, "IMAGE", savedFile.absolutePath)
                     )
+                    scheduleAutoDeleteIfEnabled(msgId)
                     refreshChatList()
                 }
             } catch (_: Exception) {
-                runOnUiThread {
-                    Toast.makeText(this, "Failed to send photo", Toast.LENGTH_SHORT).show()
-                }
             }
         }.start()
     }
@@ -302,7 +352,7 @@ class ChatActivity : AppCompatActivity() {
                 val bytes = inputStream.readBytes()
                 if (bytes.size > 6 * 1024 * 1024) {
                     runOnUiThread {
-                        Toast.makeText(this, "Please select a short video under 6 MB for Bluetooth", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Select a video under 6 MB", Toast.LENGTH_LONG).show()
                     }
                     return@Thread
                 }
@@ -315,21 +365,12 @@ class ChatActivity : AppCompatActivity() {
 
                 runOnUiThread {
                     messages.add(
-                        ChatMessage(
-                            id = msgId,
-                            text = "Video Clip",
-                            time = currentTimeString(),
-                            isSentByMe = true,
-                            mediaType = "VIDEO",
-                            localFilePath = savedFile.absolutePath
-                        )
+                        ChatMessage(msgId, "Video Clip", currentTimeString(), true, "VIDEO", savedFile.absolutePath)
                     )
+                    scheduleAutoDeleteIfEnabled(msgId)
                     refreshChatList()
                 }
             } catch (_: Exception) {
-                runOnUiThread {
-                    Toast.makeText(this, "Failed to send video", Toast.LENGTH_SHORT).show()
-                }
             }
         }.start()
     }
@@ -361,11 +402,9 @@ class ChatActivity : AppCompatActivity() {
             }
             audioRecorder = recorder
             isRecordingAudio = true
-            chatPeerStatus.text = "🎤 Recording voice note... Tap 📎 to send"
-            Toast.makeText(this, "Recording... Tap 📎 again to send voice note", Toast.LENGTH_LONG).show()
+            chatPeerStatus.text = "🎤 Recording... Tap 📎 again to send"
         } catch (_: Exception) {
             isRecordingAudio = false
-            Toast.makeText(this, "Could not start microphone", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -377,7 +416,7 @@ class ChatActivity : AppCompatActivity() {
         }
         audioRecorder = null
         isRecordingAudio = false
-        chatPeerStatus.text = "Active (Nearby Offline)"
+        chatPeerStatus.text = "Active • Offline Bluetooth"
 
         val file = audioFile ?: return
         if (!file.exists()) return
@@ -391,15 +430,9 @@ class ChatActivity : AppCompatActivity() {
 
                 runOnUiThread {
                     messages.add(
-                        ChatMessage(
-                            id = msgId,
-                            text = "Voice Note",
-                            time = currentTimeString(),
-                            isSentByMe = true,
-                            mediaType = "AUDIO",
-                            localFilePath = file.absolutePath
-                        )
+                        ChatMessage(msgId, "Voice Note", currentTimeString(), true, "AUDIO", file.absolutePath)
                     )
+                    scheduleAutoDeleteIfEnabled(msgId)
                     refreshChatList()
                 }
             } catch (_: Exception) {
@@ -416,13 +449,13 @@ class ChatActivity : AppCompatActivity() {
                 val msgId = parts[1]
                 val text = parts[2].replace("\\n", "\n")
                 runOnUiThread {
-                    messages.add(ChatMessage(msgId, text, currentTimeString(), isSentByMe = false, mediaType = "TEXT"))
+                    messages.add(ChatMessage(msgId, text, currentTimeString(), false, "TEXT"))
+                    scheduleAutoDeleteIfEnabled(msgId)
                     refreshChatList()
                 }
             }
             "DEL" -> if (parts.size >= 2) {
-                val msgId = parts[1]
-                runOnUiThread { removeMessageById(msgId) }
+                runOnUiThread { removeMessageById(parts[1]) }
             }
             "MEDIA" -> if (parts.size >= 5) {
                 val msgId = parts[1]
@@ -437,26 +470,15 @@ class ChatActivity : AppCompatActivity() {
                         "VIDEO" -> "mp4"
                         else -> fileName.substringAfterLast('.', "bin")
                     }
+                    // Saved strictly to private app cache (NOT auto-saved to Gallery)
                     val savedFile = File(cacheDir, "recv_${System.currentTimeMillis()}.$ext")
                     FileOutputStream(savedFile).use { it.write(bytes) }
 
-                    val label = when (mediaType) {
-                        "IMAGE" -> "Photo"
-                        "AUDIO" -> "Voice Note"
-                        "VIDEO" -> "Video Clip"
-                        else -> "Attachment"
-                    }
                     runOnUiThread {
                         messages.add(
-                            ChatMessage(
-                                id = msgId,
-                                text = label,
-                                time = currentTimeString(),
-                                isSentByMe = false,
-                                mediaType = mediaType,
-                                localFilePath = savedFile.absolutePath
-                            )
+                            ChatMessage(msgId, mediaType, currentTimeString(), false, mediaType, savedFile.absolutePath)
                         )
+                        scheduleAutoDeleteIfEnabled(msgId)
                         refreshChatList()
                     }
                 } catch (_: Exception) {
@@ -485,10 +507,7 @@ class ChatActivity : AppCompatActivity() {
     private fun playOrOpenMedia(msg: ChatMessage) {
         val path = msg.localFilePath ?: return
         val file = File(path)
-        if (!file.exists()) {
-            Toast.makeText(this, "Media file unavailable", Toast.LENGTH_SHORT).show()
-            return
-        }
+        if (!file.exists()) return
 
         if (msg.mediaType == "AUDIO") {
             try {
@@ -500,7 +519,6 @@ class ChatActivity : AppCompatActivity() {
                 }
                 Toast.makeText(this, "Playing voice note...", Toast.LENGTH_SHORT).show()
             } catch (_: Exception) {
-                Toast.makeText(this, "Cannot play voice note", Toast.LENGTH_SHORT).show()
             }
         } else {
             try {
@@ -512,7 +530,6 @@ class ChatActivity : AppCompatActivity() {
                 }
                 startActivity(intent)
             } catch (_: Exception) {
-                Toast.makeText(this, "No app found to open this media", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -521,7 +538,6 @@ class ChatActivity : AppCompatActivity() {
         if (!isConnected) return
         isConnected = false
         chatPeerStatus.text = "Disconnected"
-        Toast.makeText(this, "Peer disconnected from Bluetooth", Toast.LENGTH_SHORT).show()
     }
 
     private fun closeConnectionAndExit() {
@@ -537,6 +553,7 @@ class ChatActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        timerHandler.removeCallbacksAndMessages(null)
         isConnected = false
         try {
             audioRecorder?.release()
@@ -556,6 +573,7 @@ class ChatActivity : AppCompatActivity() {
             val bubbleLayout: LinearLayout = view.findViewById(R.id.bubbleLayout)
             val messageImage: ImageView = view.findViewById(R.id.messageImage)
             val mediaAttachmentPill: TextView = view.findViewById(R.id.mediaAttachmentPill)
+            val saveToGalleryBtn: TextView = view.findViewById(R.id.saveToGalleryBtn)
             val messageText: TextView = view.findViewById(R.id.messageText)
             val messageTime: TextView = view.findViewById(R.id.messageTime)
         }
@@ -575,15 +593,16 @@ class ChatActivity : AppCompatActivity() {
 
             holder.messageImage.visibility = View.GONE
             holder.mediaAttachmentPill.visibility = View.GONE
+            holder.saveToGalleryBtn.visibility = View.GONE
             holder.messageText.visibility = View.VISIBLE
 
             when (msg.mediaType) {
                 "IMAGE" -> {
                     holder.messageImage.visibility = View.VISIBLE
+                    holder.saveToGalleryBtn.visibility = View.VISIBLE
                     holder.messageText.visibility = View.GONE
                     msg.localFilePath?.let { path ->
-                        val bmp = BitmapFactory.decodeFile(path)
-                        holder.messageImage.setImageBitmap(bmp)
+                        holder.messageImage.setImageBitmap(BitmapFactory.decodeFile(path))
                     }
                 }
                 "AUDIO" -> {
@@ -594,6 +613,7 @@ class ChatActivity : AppCompatActivity() {
                 "VIDEO" -> {
                     holder.mediaAttachmentPill.visibility = View.VISIBLE
                     holder.mediaAttachmentPill.text = "🎬  Video Clip (Tap to Watch)"
+                    holder.saveToGalleryBtn.visibility = View.VISIBLE
                     holder.messageText.visibility = View.GONE
                 }
                 else -> {
@@ -603,10 +623,12 @@ class ChatActivity : AppCompatActivity() {
 
             holder.messageTime.text = msg.time
 
+            holder.saveToGalleryBtn.setOnClickListener {
+                saveMediaFileToPublicGallery(msg)
+            }
+
             holder.bubbleLayout.setOnClickListener {
-                if (msg.mediaType != "TEXT") {
-                    playOrOpenMedia(msg)
-                }
+                if (msg.mediaType != "TEXT") playOrOpenMedia(msg)
             }
 
             holder.bubbleLayout.setOnLongClickListener {
