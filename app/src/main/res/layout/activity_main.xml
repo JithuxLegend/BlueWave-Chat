@@ -15,10 +15,10 @@
         android:paddingHorizontal="18dp"
         android:paddingTop="18dp">
 
-        <!-- Top Bar: "Blue Wave" + Clean Shark Logo on Right of Title + Profile Avatar -->
+        <!-- Top Bar: Smaller "Blue Wave" + Transparent Shark Logo Close Beside Text + Profile Avatar -->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="54dp">
+            android:layout_height="52dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -33,23 +33,22 @@
                     android:layout_height="wrap_content"
                     android:text="Blue Wave"
                     android:textColor="#0F172A"
-                    android:textSize="26sp"
+                    android:textSize="21sp"
                     android:textStyle="bold" />
 
                 <ImageView
                     android:id="@+id/headerBrandLogo"
-                    android:layout_width="38dp"
-                    android:layout_height="38dp"
-                    android:layout_marginStart="8dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/shark_logo_clean" />
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:layout_marginStart="5dp"
+                    android:scaleType="fitCenter" />
             </LinearLayout>
 
             <!-- Tappable User Profile Avatar -->
             <LinearLayout
                 android:id="@+id/profileAvatarBtn"
-                android:layout_width="46dp"
-                android:layout_height="46dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:background="@drawable/bg_white_pill"
@@ -57,7 +56,7 @@
                 android:elevation="3dp"
                 android:focusable="true"
                 android:gravity="center"
-                android:padding="3dp">
+                android:padding="2dp">
 
                 <ImageView
                     android:id="@+id/userProfileAvatar"
@@ -71,8 +70,8 @@
         <LinearLayout
             android:id="@+id/searchBarBox"
             android:layout_width="match_parent"
-            android:layout_height="46dp"
-            android:layout_marginTop="14dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="12dp"
             android:background="@drawable/bg_white_pill"
             android:gravity="center_vertical"
             android:orientation="horizontal"
@@ -102,13 +101,13 @@
         <!-- Pastel Mesh Hero Card -->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="136dp"
-            android:layout_marginTop="16dp"
+            android:layout_height="130dp"
+            android:layout_marginTop="14dp"
             android:background="@drawable/bg_hero_card"
             android:padding="18dp">
 
             <TextView
-                android:id="@+id/heroOfflinePill"
+                android:id="@+id/heroModeBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -134,7 +133,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:text="●  Ready for Offline Peers"
+                android:text="●  Ready for Chat Peers"
                 android:textColor="#1E293B"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -144,7 +143,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="10dp">
 
             <TextView
@@ -174,7 +173,7 @@
             android:background="@drawable/bg_white_pill"
             android:gravity="center"
             android:padding="20dp"
-            android:text="No nearby peers yet.\nTap 'Open Radar →' to scan for devices around you."
+            android:text="No chat phones nearby yet.\nAudio accessories &amp; watches are hidden automatically.\nTap 'Open Radar →' to scan for phones."
             android:textColor="#64748B"
             android:textSize="13sp"
             android:visibility="gone" />
@@ -189,7 +188,7 @@
             android:scrollbars="none" />
     </LinearLayout>
 
-    <!-- ==================== PAGE B: RADAR (NO OVERLAP!) ==================== -->
+    <!-- ==================== PAGE B: RADAR ==================== -->
     <LinearLayout
         android:id="@+id/pageRadarContainer"
         android:layout_width="match_parent"
@@ -210,14 +209,14 @@
             android:textSize="22sp"
             android:textStyle="bold" />
 
-        <!-- Status Bar -->
+        <!-- Bluetooth Discoverable: Auto vs Manual Mode Toggle -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:background="@drawable/bg_white_pill"
             android:paddingHorizontal="16dp"
-            android:paddingVertical="12dp">
+            android:paddingVertical="11dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -228,36 +227,70 @@
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/connectionBadge"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:background="@drawable/bg_black_pill"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="5dp"
-                android:text="READY"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp"
-                android:textStyle="bold" />
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/radarModeAutoBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_black_pill"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="5dp"
+                    android:text="AUTO"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/radarModeManualBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_white_pill"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="5dp"
+                    android:text="MANUAL"
+                    android:textColor="#0F172A"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
         </RelativeLayout>
 
-        <!-- Dedicated Non-Overlapping Radar Sonar Box -->
-        <FrameLayout
+        <!-- Bright Blue Radar Display Box + Total Connections Counter Below -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:background="@drawable/bg_white_pill">
+            android:background="@drawable/bg_white_pill"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="12dp">
 
             <com.bluewave.chat.RadarView
                 android:id="@+id/radarSonarView"
-                android:layout_width="136dp"
-                android:layout_height="136dp"
-                android:layout_gravity="center" />
-        </FrameLayout>
+                android:layout_width="148dp"
+                android:layout_height="148dp" />
 
-        <!-- Discovered Peers List (Cleanly Below the Radar Box) -->
+            <TextView
+                android:id="@+id/radarTotalConnectionsText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="#E0F2FE"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="5dp"
+                android:text="0 Nearby Connections Detected"
+                android:textColor="#0369A1"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Discovered Phones List -->
         <ListView
             android:id="@+id/deviceListView"
             android:layout_width="match_parent"
@@ -284,7 +317,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:text="Tap Broadcast Signal to discover nearby devices"
+                android:text="Auto-scanning for nearby phones..."
                 android:textColor="#475569"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -292,7 +325,7 @@
             <Button
                 android:id="@+id/scanButton"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="46dp"
                 android:background="@drawable/bg_black_pill"
                 android:text="Broadcast Signal"
                 android:textAllCaps="false"
@@ -325,7 +358,7 @@
                 android:layout_height="wrap_content"
                 android:text="Settings"
                 android:textColor="#0F172A"
-                android:textSize="26sp"
+                android:textSize="25sp"
                 android:textStyle="bold" />
 
             <!-- Card 1: Profile & Avatar Shortcut -->
@@ -333,7 +366,7 @@
                 android:id="@+id/settingsProfileCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="14dp"
                 android:background="@drawable/bg_white_pill"
                 android:clickable="true"
                 android:focusable="true"
@@ -358,7 +391,7 @@
                         android:id="@+id/settingsDisplayNameText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="BlueWave Explorer"
+                        android:text="Ocean Nomad"
                         android:textColor="#0F172A"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -367,7 +400,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Tap to change avatar or nickname"
+                        android:text="Tap to change character avatar or nickname"
                         android:textColor="#2563EB"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -381,11 +414,11 @@
                     android:textSize="24sp" />
             </LinearLayout>
 
-            <!-- Card 2: App Theme Switcher (Pastel / White / Dark) -->
+            <!-- Card 2: App Theme Switcher -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="12dp"
                 android:background="@drawable/bg_white_pill"
                 android:orientation="vertical"
                 android:padding="16dp">
@@ -398,24 +431,16 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginBottom="12dp"
-                    android:text="Switch between Pastel Mesh, Pure White, or Midnight Dark"
-                    android:textColor="#64748B"
-                    android:textSize="12sp" />
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/themePastelBtn"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="38dp"
                         android:layout_marginEnd="6dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_black_pill"
@@ -428,7 +453,7 @@
                     <TextView
                         android:id="@+id/themeWhiteBtn"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="38dp"
                         android:layout_marginHorizontal="4dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_white_pill"
@@ -441,7 +466,7 @@
                     <TextView
                         android:id="@+id/themeDarkBtn"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="38dp"
                         android:layout_marginStart="6dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_white_pill"
@@ -453,11 +478,11 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Card 3: Mesh & Chat Preferences -->
+            <!-- Card 3: Media Transfer Mode (Bluetooth Offline vs Internet Hybrid) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="12dp"
                 android:background="@drawable/bg_white_pill"
                 android:orientation="vertical"
                 android:padding="16dp">
@@ -465,7 +490,234 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Bluetooth &amp; Privacy"
+                    android:text="Media Delivery Channel"
+                    android:textColor="#0F172A"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="10dp"
+                    android:text="Choose how photos, videos &amp; voice notes are sent"
+                    android:textColor="#64748B"
+                    android:textSize="12sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/mediaViaBluetoothBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_black_pill"
+                        android:gravity="center"
+                        android:text="Bluetooth Offline"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/mediaViaInternetBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_white_pill"
+                        android:gravity="center"
+                        android:text="Internet / Hybrid"
+                        android:textColor="#0F172A"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Card 4: Bluetooth Range & Signal Boost -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_white_pill"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bluetooth Range &amp; Signal Boost"
+                    android:textColor="#0F172A"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/rangeStandardBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="38dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_white_pill"
+                        android:gravity="center"
+                        android:text="Battery (10m)"
+                        android:textColor="#0F172A"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/rangeBoostBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="38dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_black_pill"
+                        android:gravity="center"
+                        android:text="Signal Boost (30m)"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Card 5: Auto-Delete Chat Timer & Custom Chat Wallpaper -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_white_pill"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Auto-Delete Chat Timer"
+                    android:textColor="#0F172A"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/timerOffBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_black_pill"
+                        android:gravity="center"
+                        android:text="Off"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/timer1hBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_white_pill"
+                        android:gravity="center"
+                        android:text="1 Hour"
+                        android:textColor="#0F172A"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/timer24hBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_white_pill"
+                        android:gravity="center"
+                        android:text="24 Hours"
+                        android:textColor="#0F172A"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="Custom Chat Wallpaper"
+                    android:textColor="#0F172A"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/wallPastelBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_black_pill"
+                        android:gravity="center"
+                        android:text="Pastel"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/wallOceanBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_white_pill"
+                        android:gravity="center"
+                        android:text="Sky Blue"
+                        android:textColor="#0F172A"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/wallDarkBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_white_pill"
+                        android:gravity="center"
+                        android:text="Midnight"
+                        android:textColor="#0F172A"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Card 6: QR / Quick Pair Card & Bluetooth Shortcuts -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_white_pill"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Quick Pair &amp; Controls"
                     android:textColor="#0F172A"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -474,7 +726,7 @@
                     android:id="@+id/switchAutoAccept"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="10dp"
                     android:checked="true"
                     android:text="Auto-accept incoming peer connections"
                     android:textColor="#334155"
@@ -484,49 +736,35 @@
                     android:id="@+id/switchVibrate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="8dp"
                     android:checked="true"
                     android:text="Vibrate on new offline message"
                     android:textColor="#334155"
                     android:textSize="13sp" />
 
                 <TextView
+                    android:id="@+id/btnQuickPairQr"
+                    android:layout_width="match_parent"
+                    android:layout_height="42dp"
+                    android:layout_marginTop="12dp"
+                    android:background="#E0F2FE"
+                    android:gravity="center"
+                    android:text="📲  Show My QR / Quick Pair Card"
+                    android:textColor="#0369A1"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
                     android:id="@+id/btnSystemBluetooth"
                     android:layout_width="match_parent"
                     android:layout_height="42dp"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="10dp"
                     android:background="@drawable/bg_black_pill"
                     android:gravity="center"
                     android:text="Open Device Bluetooth Settings"
                     android:textColor="#FFFFFF"
                     android:textSize="13sp"
                     android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Card 4: App Version & Mesh Info -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_white_pill"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="100% Offline Bluetooth Mesh"
-                    android:textColor="#0F172A"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Zero internet or mobile data required. All messages, photos, voice notes, and videos stay directly between paired Bluetooth devices within 10–30m."
-                    android:textColor="#64748B"
-                    android:textSize="13sp" />
 
                 <View
                     android:layout_width="match_parent"
@@ -538,7 +776,7 @@
                     android:id="@+id/appVersionInfoText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Version 1.0.0 (Build 49)  •  Offline RFCOMM Engine"
+                    android:text="Version 1.1.0 (Build 52)  •  Offline RFCOMM Mesh"
                     android:textColor="#475569"
                     android:textSize="12sp"
                     android:textStyle="bold" />
