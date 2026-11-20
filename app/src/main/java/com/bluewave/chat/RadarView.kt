@@ -9,6 +9,8 @@ import android.graphics.SweepGradient
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.LinearInterpolator
+import kotlin.math.cos
+import kotlin.math.sin
 
 class RadarView @JvmOverloads constructor(
     context: Context,
@@ -16,55 +18,97 @@ class RadarView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private val coreFillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    var detectedTargetCount: Int = 0
+        set(value) {
+            field = value.coerceIn(0, 8)
+            invalidate()
+        }
+
+    var isScanningActive: Boolean = true
+        set(value) {
+            field = value
+            if (value && !animator.isStarted) animator.start()
+            invalidate()
+        }
+
+    private val bgDiscPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
-        color = 0x1A007BFF
+        color = 0xFF06162E.toInt() // Deep midnight-navy radar core
+    }
+
+    private val outerBezelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 4f
+        color = 0xFF00A8FF.toInt() // Bright electric blue bezel
+    }
+
+    private val tickPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 2f
+        color = 0xCC38BDF8.toInt()
+    }
+
+    private val degreeTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = 0xFF7DD3FC.toInt()
+        textSize = 16f
+        textAlign = Paint.Align.CENTER
+        isFakeBoldText = true
+    }
+
+    private val polarGridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 1.6f
+        color = 0x4438BDF8
     }
 
     private val ringPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
-        strokeWidth = 3.5f
-        color = 0xCC007BFF.toInt() // Bright Electric Blue rings
-    }
-
-    private val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
-        strokeWidth = 2f
-        color = 0x44007BFF
+        strokeWidth = 2.4f
+        color = 0x9900A8FF.toInt()
     }
 
     private val sweepPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
     }
 
-    private val pulseRingPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val sweepLeadingLinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
-        strokeWidth = 5f
-        color = 0xFF00A8FF.toInt()
+        strokeWidth = 3.5f
+        color = 0xFF7DD3FC.toInt()
     }
 
-    private val centerGlowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val blipGlowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
-        color = 0x44007BFF
+        color = 0x5538BDF8
     }
 
-    private val centerDotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val blipCorePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
-        color = 0xFF0066FF.toInt()
+        color = 0xFFFFFFFF.toInt()
     }
 
-    private var sweepAngle = 0f
-    private var pulseFraction = 0f
+    private val blipBracketPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 2.5f
+        color = 0xFF38BDF8.toInt()
+    }
+
+    private var sweepAngle = 45f
     private val ovalRect = RectF()
 
+    // Fixed polar coordinates for detected peer blips inside the inner radar
+    private val blipAngles = floatArrayOf(42f, 132f, 228f, 305f, 18f, 175f, 265f, 340f)
+    private val blipDistances = floatArrayOf(0.55f, 0.68f, 0.48f, 0.62f, 0.76f, 0.42f, 0.72f, 0.50f)
+
     private val animator = ValueAnimator.ofFloat(0f, 360f).apply {
-        duration = 2600L
+        duration = 2800L
         repeatCount = ValueAnimator.INFINITE
         interpolator = LinearInterpolator()
         addUpdateListener {
-            sweepAngle = it.animatedValue as Float
-            pulseFraction = (sweepAngle % 180f) / 180f
-            invalidate()
+            if (isScanningActive) {
+                sweepAngle = it.animatedValue as Float
+                invalidate()
+            }
         }
     }
 
@@ -82,39 +126,86 @@ class RadarView @JvmOverloads constructor(
         super.onDraw(canvas)
         val cx = width / 2f
         val cy = height / 2f
-        val maxRadius = minOf(cx, cy) - 10f
-        if (maxRadius <= 0f) return
+        val outerRadius = minOf(cx, cy) - 8f
+        if (outerRadius <= 24f) return
 
-        // Soft bright-blue radar disc backdrop
-        canvas.drawCircle(cx, cy, maxRadius, coreFillPaint)
+        val innerRadius = outerRadius * 0.78f
 
-        // Crosshair axes
-        canvas.drawLine(cx - maxRadius, cy, cx + maxRadius, cy, gridPaint)
-        canvas.drawLine(cx, cy - maxRadius, cx, cy + maxRadius, gridPaint)
+        // 1. Deep navy radar disc
+        canvas.drawCircle(cx, cy, outerRadius, bgDiscPaint)
+        canvas.drawCircle(cx, cy, outerRadius, outerBezelPaint)
+        canvas.drawCircle(cx, cy, innerRadius, outerBezelPaint)
 
-        // Sweeping radar beam
-        ovalRect.set(cx - maxRadius, cy - maxRadius, cx + maxRadius, cy + maxRadius)
-        sweepPaint.shader = SweepGradient(
-            cx, cy,
-            intArrayOf(0x00007BFF, 0x5500A8FF, 0x00007BFF),
-            floatArrayOf(0f, 0.22f, 0.35f)
-        )
-        canvas.save()
-        canvas.rotate(sweepAngle, cx, cy)
-        canvas.drawArc(ovalRect, 0f, 95f, true, sweepPaint)
-        canvas.restore()
+        // 2. Img-8 Outer Compass Degree Ticks & Numbers (0, 30, 60 ... 330)
+        for (deg in 0 until 360 step 5) {
+            val rad = Math.toRadians((deg - 90).toDouble())
+            val isMajor = deg % 30 == 0
+            val startR = if (isMajor) outerRadius - 14f else outerRadius - 7f
+            val endR = outerRadius - 2f
+            canvas.drawLine(
+                cx + (cos(rad) * startR).toFloat(),
+                cy + (sin(rad) * startR).toFloat(),
+                cx + (cos(rad) * endR).toFloat(),
+                cy + (sin(rad) * endR).toFloat(),
+                tickPaint
+            )
+            if (isMajor) {
+                val textR = outerRadius - 24f
+                val tx = cx + (cos(rad) * textR).toFloat()
+                val ty = cy + (sin(rad) * textR).toFloat() + 6f
+                canvas.drawText(deg.toString(), tx, ty, degreeTextPaint)
+            }
+        }
 
-        // Bright Blue concentric rings
-        canvas.drawCircle(cx, cy, maxRadius * 0.35f, ringPaint)
-        canvas.drawCircle(cx, cy, maxRadius * 0.68f, ringPaint)
-        canvas.drawCircle(cx, cy, maxRadius, ringPaint)
+        // 3. Img-9 Inner Polar Spokes & Concentric Sonar Rings
+        for (deg in 0 until 360 step 30) {
+            val rad = Math.toRadians(deg.toDouble())
+            canvas.drawLine(
+                cx, cy,
+                cx + (cos(rad) * innerRadius).toFloat(),
+                cy + (sin(rad) * innerRadius).toFloat(),
+                polarGridPaint
+            )
+        }
+        canvas.drawCircle(cx, cy, innerRadius * 0.33f, ringPaint)
+        canvas.drawCircle(cx, cy, innerRadius * 0.66f, ringPaint)
 
-        // Expanding sonar wave
-        pulseRingPaint.alpha = ((1f - pulseFraction) * 210).toInt().coerceIn(0, 210)
-        canvas.drawCircle(cx, cy, maxRadius * pulseFraction, pulseRingPaint)
+        // 4. Sweeping Electric-Blue Beam (when scanning is active)
+        if (isScanningActive) {
+            ovalRect.set(cx - innerRadius, cy - innerRadius, cx + innerRadius, cy + innerRadius)
+            sweepPaint.shader = SweepGradient(
+                cx, cy,
+                intArrayOf(0x0000A8FF, 0x6600A8FF, 0xCC38BDF8.toInt(), 0x0000A8FF),
+                floatArrayOf(0f, 0.18f, 0.26f, 0.28f)
+            )
+            canvas.save()
+            canvas.rotate(sweepAngle - 95f, cx, cy)
+            canvas.drawArc(ovalRect, 0f, 95f, true, sweepPaint)
+            canvas.restore()
 
-        // Center beacon
-        canvas.drawCircle(cx, cy, 22f, centerGlowPaint)
-        canvas.drawCircle(cx, cy, 11f, centerDotPaint)
+            val beamRad = Math.toRadians(sweepAngle.toDouble())
+            canvas.drawLine(
+                cx, cy,
+                cx + (cos(beamRad) * innerRadius).toFloat(),
+                cy + (sin(beamRad) * innerRadius).toFloat(),
+                sweepLeadingLinePaint
+            )
+        }
+
+        // 5. Img-9 Locked-On Target Blips [●] for Nearby Peers
+        for (i in 0 until detectedTargetCount) {
+            val rad = Math.toRadians(blipAngles[i].toDouble())
+            val dist = innerRadius * blipDistances[i]
+            val bx = cx + (cos(rad) * dist).toFloat()
+            val by = cy + (sin(rad) * dist).toFloat()
+
+            canvas.drawCircle(bx, by, 14f, blipGlowPaint)
+            canvas.drawCircle(bx, by, 5.5f, blipCorePaint)
+            canvas.drawRect(bx - 12f, by - 12f, bx + 12f, by + 12f, blipBracketPaint)
+        }
+
+        // 6. Center Beacon Core
+        canvas.drawCircle(cx, cy, 12f, blipGlowPaint)
+        canvas.drawCircle(cx, cy, 6f, outerBezelPaint)
     }
 }
