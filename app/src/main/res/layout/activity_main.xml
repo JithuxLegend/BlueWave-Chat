@@ -15,7 +15,6 @@
         android:paddingHorizontal="18dp"
         android:paddingTop="14dp">
 
-        <!-- Top Header -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="50dp">
@@ -62,7 +61,6 @@
                     android:text="📷"
                     android:textSize="16sp" />
 
-                <!-- Tapping Top-Right Avatar Opens Edit Profile -->
                 <LinearLayout
                     android:id="@+id/profileAvatarBtn"
                     android:layout_width="44dp"
@@ -115,7 +113,7 @@
                 android:textSize="13sp" />
         </LinearLayout>
 
-        <!-- Stories & Floating Notes Bar (Tap Circle to Post Photo/Video Story or Note!) -->
+        <!-- Stories & Multi-Line Quote Notes Row -->
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -171,7 +169,6 @@
                 android:textStyle="bold" />
         </RelativeLayout>
 
-        <!-- Direct Messages Header -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -220,7 +217,7 @@
             android:scrollbars="none" />
     </LinearLayout>
 
-    <!-- ==================== PAGE 2: RADAR + SIDE TELEMETRY (IMG-4 & IMG-5) ==================== -->
+    <!-- ==================== PAGE 2: MILITARY TACTICAL MAP RADAR + LIVE ANALYTIC RF ==================== -->
     <LinearLayout
         android:id="@+id/pageRadarContainer"
         android:layout_width="match_parent"
@@ -236,12 +233,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="Sonar Radar"
+            android:text="Tactical Sonar Radar"
             android:textColor="#0F172A"
             android:textSize="21sp"
             android:textStyle="bold" />
 
-        <!-- Discoverable Auto/Manual Bar -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -293,12 +289,12 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <!-- Blue Radar Circle + Img-5 Analytic Telemetry Side Panel -->
+        <!-- Military Tactical Map Card Behind Radar + Live Analytic RF -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:background="@drawable/bg_white_pill"
+            android:background="@drawable/bg_tactical_radar_card"
             android:orientation="vertical"
             android:padding="12dp">
 
@@ -310,25 +306,25 @@
 
                 <com.bluewave.chat.RadarView
                     android:id="@+id/radarSonarView"
-                    android:layout_width="184dp"
-                    android:layout_height="184dp" />
+                    android:layout_width="182dp"
+                    android:layout_height="182dp" />
 
-                <!-- Side Telemetry Panel inspired by Img-5 in Blue -->
+                <!-- Live Updating Military Telemetry Panel -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginStart="10dp"
                     android:layout_weight="1"
-                    android:background="#F0F9FF"
+                    android:background="#1A38BDF8"
                     android:orientation="vertical"
                     android:padding="10dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="ANALYTIC RF"
-                        android:textColor="#0284C7"
-                        android:textSize="12sp"
+                        android:text="ANALYTIC RF • LIVE"
+                        android:textColor="#38BDF8"
+                        android:textSize="11.5sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -337,7 +333,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:text="ACCURACY  ▮▮▮▮▮ 98%"
-                        android:textColor="#0369A1"
+                        android:textColor="#BAE6FD"
                         android:textSize="10sp"
                         android:textStyle="bold" />
 
@@ -347,7 +343,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="AMPLITUDE ▮▮▮▮ 84dB"
-                        android:textColor="#0369A1"
+                        android:textColor="#BAE6FD"
                         android:textSize="10sp"
                         android:textStyle="bold" />
 
@@ -357,7 +353,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="PRESSURE  ▮▮▮▮ 5640"
-                        android:textColor="#0369A1"
+                        android:textColor="#BAE6FD"
                         android:textSize="10sp"
                         android:textStyle="bold" />
 
@@ -367,7 +363,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="POWER     ▮▮▮▮▮ 30m"
-                        android:textColor="#0369A1"
+                        android:textColor="#BAE6FD"
                         android:textSize="10sp"
                         android:textStyle="bold" />
 
@@ -375,13 +371,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginVertical="6dp"
-                        android:background="#BAE6FD" />
+                        android:background="#3338BDF8" />
 
                     <TextView
+                        android:id="@+id/telemetrySectorText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="FREQ: 2.402 GHz\nNOISE: -92 dBm\nSHIELD: AES-256"
-                        android:textColor="#0284C7"
+                        android:text="SEC: 09°58'N 76°17'E\nNOISE: -92 dBm • AES"
+                        android:textColor="#7DD3FC"
                         android:textSize="9.5sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -393,11 +390,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
-                android:background="#E0F2FE"
+                android:background="#2638BDF8"
                 android:paddingHorizontal="14dp"
                 android:paddingVertical="5dp"
                 android:text="0 Nearby Connections Detected"
-                android:textColor="#0369A1"
+                android:textColor="#E0F2FE"
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -445,7 +442,7 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- ==================== PAGE 3: 7-DAY PROFILE & POST FEED (IMG-8 & IMG-10) ==================== -->
+    <!-- ==================== PAGE 3: INSTAGRAM 3-COLUMN GRID FEED (IMG-5) ==================== -->
     <LinearLayout
         android:id="@+id/pageFeedContainer"
         android:layout_width="match_parent"
@@ -456,27 +453,26 @@
         android:paddingTop="14dp"
         android:visibility="gone">
 
-        <!-- Profile Header Card (Img-8 Style) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_white_pill"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="14dp">
 
             <ImageView
                 android:id="@+id/feedProfileAvatar"
-                android:layout_width="76dp"
-                android:layout_height="76dp"
+                android:layout_width="74dp"
+                android:layout_height="74dp"
                 android:scaleType="centerCrop" />
 
             <TextView
                 android:id="@+id/feedProfileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Pixel Drift"
+                android:layout_marginTop="6dp"
+                android:text="Luna Breeze"
                 android:textColor="#0F172A"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -487,8 +483,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:background="#E0F2FE"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="4dp"
+                android:maxWidth="280dp"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="5dp"
                 android:text="💭 Feeling wavey today!"
                 android:textColor="#0369A1"
                 android:textSize="12sp" />
@@ -496,14 +493,14 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="10dp"
                 android:gravity="center"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/btnCreateFeedPost"
                     android:layout_width="0dp"
-                    android:layout_height="40dp"
+                    android:layout_height="38dp"
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_black_pill"
@@ -516,7 +513,7 @@
                 <TextView
                     android:id="@+id/btnPostNoteShortcut"
                     android:layout_width="0dp"
-                    android:layout_height="40dp"
+                    android:layout_height="38dp"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
                     android:background="#E0F2FE"
@@ -532,21 +529,24 @@
             android:id="@+id/feedSectionTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="8dp"
-            android:text="7-Day Profile Feed (Auto-Deletes After 7 Days)"
+            android:text="7-Day Photo Grid (Tap any photo to open, like, comment or delete)"
             android:textColor="#0F172A"
-            android:textSize="14sp"
+            android:textSize="12.5sp"
             android:textStyle="bold" />
 
-        <ListView
-            android:id="@+id/profilePostsListView"
+        <!-- Instagram-Style 3-Column Photo Grid -->
+        <GridView
+            android:id="@+id/profilePostsGridView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="12dp"
-            android:scrollbars="none" />
+            android:horizontalSpacing="6dp"
+            android:numColumns="3"
+            android:scrollbars="none"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="6dp" />
     </LinearLayout>
 
     <!-- ==================== PAGE 4: SETTINGS & THEMES ==================== -->
@@ -575,7 +575,6 @@
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
-            <!-- Profile Card -->
             <LinearLayout
                 android:id="@+id/settingsProfileCard"
                 android:layout_width="match_parent"
@@ -605,7 +604,7 @@
                         android:id="@+id/settingsDisplayNameText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Pixel Drift"
+                        android:text="Luna Breeze"
                         android:textColor="#0F172A"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -614,7 +613,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Tap to choose from 10 Img-7 avatars or 24 names"
+                        android:text="Tap to choose from 10 avatars or 24 names"
                         android:textColor="#2563EB"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -628,7 +627,7 @@
                     android:textSize="24sp" />
             </LinearLayout>
 
-            <!-- 6 Instagram / Telegram App Themes -->
+            <!-- 6 App Themes -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -640,7 +639,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="App Theme (Instagram &amp; Telegram Styles)"
+                    android:text="App Theme"
                     android:textColor="#0F172A"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -736,7 +735,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Radio Security & Media Firewall -->
+            <!-- Security & Privacy -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -786,7 +785,7 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- High-Speed 500MB Transfer & Calling Channel -->
+            <!-- Transfer & Range -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -870,7 +869,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Auto-Delete Chat Timer & Chat Wallpaper -->
+            <!-- Auto-Delete & Wallpaper -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -1056,7 +1055,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="Version 2.0.0 (Build 58)  •  Hybrid Mesh + Voice/Video"
+                    android:text="Version 2.1.0 (Build 61)  •  Tactical Mesh + Social Grid"
                     android:textColor="#475569"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -1064,7 +1063,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- ==================== IMG-9 TRANSLUCENT GLASS PILL NAVIGATION BAR ==================== -->
+    <!-- ==================== FROSTED GLASS PILL NAVIGATION BAR ==================== -->
     <LinearLayout
         android:id="@+id/floatingNavWrapper"
         android:layout_width="match_parent"
@@ -1075,7 +1074,6 @@
         android:paddingHorizontal="14dp"
         android:paddingBottom="10dp">
 
-        <!-- Main Frosted Glass Pill Capsule -->
         <LinearLayout
             android:id="@+id/bottomNavBar"
             android:layout_width="0dp"
@@ -1133,7 +1131,6 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Separate Circular Floating Search Orb (Img-9 Right Circle) -->
         <TextView
             android:id="@+id/floatingSearchOrbBtn"
             android:layout_width="58dp"
@@ -1147,3 +1144,5 @@
     </LinearLayout>
 
 </RelativeLayout>
+
+             
