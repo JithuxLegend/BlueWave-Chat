@@ -4,6 +4,7 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.RectF
 import android.graphics.SweepGradient
 import android.util.AttributeSet
@@ -31,15 +32,29 @@ class RadarView @JvmOverloads constructor(
             invalidate()
         }
 
+    var onTelemetryTick: ((sweepDeg: Float) -> Unit)? = null
+
     private val bgDiscPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
-        color = 0xFF06162E.toInt() // Deep midnight-navy radar core
+        color = 0xFF041326.toInt()
+    }
+
+    private val topoLinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 1.5f
+        color = 0x3300E5FF
+    }
+
+    private val tacGridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 1f
+        color = 0x2638BDF8
     }
 
     private val outerBezelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = 4f
-        color = 0xFF00A8FF.toInt() // Bright electric blue bezel
+        color = 0xFF00A8FF.toInt()
     }
 
     private val tickPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -50,21 +65,15 @@ class RadarView @JvmOverloads constructor(
 
     private val degreeTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = 0xFF7DD3FC.toInt()
-        textSize = 16f
+        textSize = 15f
         textAlign = Paint.Align.CENTER
         isFakeBoldText = true
     }
 
-    private val polarGridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
-        strokeWidth = 1.6f
-        color = 0x4438BDF8
-    }
-
     private val ringPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
-        strokeWidth = 2.4f
-        color = 0x9900A8FF.toInt()
+        strokeWidth = 2.2f
+        color = 0x8800A8FF.toInt()
     }
 
     private val sweepPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -94,9 +103,10 @@ class RadarView @JvmOverloads constructor(
     }
 
     private var sweepAngle = 45f
+    private var lastTelemetryUpdate = 0L
     private val ovalRect = RectF()
+    private val clipPath = Path()
 
-    // Fixed polar coordinates for detected peer blips inside the inner radar
     private val blipAngles = floatArrayOf(42f, 132f, 228f, 305f, 18f, 175f, 265f, 340f)
     private val blipDistances = floatArrayOf(0.55f, 0.68f, 0.48f, 0.62f, 0.76f, 0.42f, 0.72f, 0.50f)
 
@@ -107,6 +117,11 @@ class RadarView @JvmOverloads constructor(
         addUpdateListener {
             if (isScanningActive) {
                 sweepAngle = it.animatedValue as Float
+                val now = System.currentTimeMillis()
+                if (now - lastTelemetryUpdate > 450L) {
+                    lastTelemetryUpdate = now
+                    onTelemetryTick?.invoke(sweepAngle)
+                }
                 invalidate()
             }
         }
@@ -131,16 +146,41 @@ class RadarView @JvmOverloads constructor(
 
         val innerRadius = outerRadius * 0.78f
 
-        // 1. Deep navy radar disc
+        // 1. Tactical Military Disc + Clipped Topographic Map Contours
         canvas.drawCircle(cx, cy, outerRadius, bgDiscPaint)
+
+        canvas.save()
+        clipPath.reset()
+        clipPath.addCircle(cx, cy, innerRadius, Path.Direction.CW)
+        canvas.clipPath(clipPath)
+
+        // Military Square Sector Grid inside radar
+        val step = innerRadius / 3.5f
+        var gx = cx - innerRadius
+        while (gx <= cx + innerRadius) {
+            canvas.drawLine(gx, cy - innerRadius, gx, cy + innerRadius, tacGridPaint)
+            gx += step
+        }
+        var gy = cy - innerRadius
+        while (gy <= cy + innerRadius) {
+            canvas.drawLine(cx - innerRadius, gy, cx + innerRadius, gy, tacGridPaint)
+            gy += step
+        }
+
+        // Topographic Elevation Contours
+        canvas.drawOval(cx - innerRadius * 0.8f, cy - innerRadius * 0.45f, cx + innerRadius * 0.2f, cy + innerRadius * 0.35f, topoLinePaint)
+        canvas.drawOval(cx - innerRadius * 0.55f, cy - innerRadius * 0.25f, cx + innerRadius * 0.05f, cy + innerRadius * 0.18f, topoLinePaint)
+        canvas.drawOval(cx - innerRadius * 0.1f, cy - innerRadius * 0.1f, cx + innerRadius * 0.75f, cy + innerRadius * 0.65f, topoLinePaint)
+        canvas.restore()
+
+        // 2. Outer Compass Bezel & Degree Markings
         canvas.drawCircle(cx, cy, outerRadius, outerBezelPaint)
         canvas.drawCircle(cx, cy, innerRadius, outerBezelPaint)
 
-        // 2. Img-8 Outer Compass Degree Ticks & Numbers (0, 30, 60 ... 330)
         for (deg in 0 until 360 step 5) {
             val rad = Math.toRadians((deg - 90).toDouble())
             val isMajor = deg % 30 == 0
-            val startR = if (isMajor) outerRadius - 14f else outerRadius - 7f
+            val startR = if (isMajor) outerRadius - 13f else outerRadius - 6f
             val endR = outerRadius - 2f
             canvas.drawLine(
                 cx + (cos(rad) * startR).toFloat(),
@@ -150,27 +190,30 @@ class RadarView @JvmOverloads constructor(
                 tickPaint
             )
             if (isMajor) {
-                val textR = outerRadius - 24f
-                val tx = cx + (cos(rad) * textR).toFloat()
-                val ty = cy + (sin(rad) * textR).toFloat() + 6f
-                canvas.drawText(deg.toString(), tx, ty, degreeTextPaint)
+                val textR = outerRadius - 23f
+                canvas.drawText(
+                    deg.toString(),
+                    cx + (cos(rad) * textR).toFloat(),
+                    cy + (sin(rad) * textR).toFloat() + 5f,
+                    degreeTextPaint
+                )
             }
         }
 
-        // 3. Img-9 Inner Polar Spokes & Concentric Sonar Rings
+        // 3. Polar Spokes & Range Rings
         for (deg in 0 until 360 step 30) {
             val rad = Math.toRadians(deg.toDouble())
             canvas.drawLine(
                 cx, cy,
                 cx + (cos(rad) * innerRadius).toFloat(),
                 cy + (sin(rad) * innerRadius).toFloat(),
-                polarGridPaint
+                tacGridPaint
             )
         }
         canvas.drawCircle(cx, cy, innerRadius * 0.33f, ringPaint)
         canvas.drawCircle(cx, cy, innerRadius * 0.66f, ringPaint)
 
-        // 4. Sweeping Electric-Blue Beam (when scanning is active)
+        // 4. Sweeping Beam
         if (isScanningActive) {
             ovalRect.set(cx - innerRadius, cy - innerRadius, cx + innerRadius, cy + innerRadius)
             sweepPaint.shader = SweepGradient(
@@ -192,7 +235,7 @@ class RadarView @JvmOverloads constructor(
             )
         }
 
-        // 5. Img-9 Locked-On Target Blips [●] for Nearby Peers
+        // 5. Locked Target Blips
         for (i in 0 until detectedTargetCount) {
             val rad = Math.toRadians(blipAngles[i].toDouble())
             val dist = innerRadius * blipDistances[i]
@@ -204,8 +247,7 @@ class RadarView @JvmOverloads constructor(
             canvas.drawRect(bx - 12f, by - 12f, bx + 12f, by + 12f, blipBracketPaint)
         }
 
-        // 6. Center Beacon Core
-        canvas.drawCircle(cx, cy, 12f, blipGlowPaint)
-        canvas.drawCircle(cx, cy, 6f, outerBezelPaint)
+        canvas.drawCircle(cx, cy, 11f, blipGlowPaint)
+        canvas.drawCircle(cx, cy, 5.5f, outerBezelPaint)
     }
 }
