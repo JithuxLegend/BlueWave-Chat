@@ -5,17 +5,17 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_pastel_mesh">
 
-    <!-- ==================== PAGE A: SOCIAL HOME / CHATS ==================== -->
+    <!-- ==================== PAGE 1: SOCIAL HOME & CHATS ==================== -->
     <LinearLayout
         android:id="@+id/pageChatsContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottomNavBar"
+        android:layout_above="@+id/floatingNavWrapper"
         android:orientation="vertical"
         android:paddingHorizontal="18dp"
-        android:paddingTop="16dp">
+        android:paddingTop="14dp">
 
-        <!-- Top Social Header -->
+        <!-- Top Header -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="50dp">
@@ -62,6 +62,7 @@
                     android:text="📷"
                     android:textSize="16sp" />
 
+                <!-- Tapping Top-Right Avatar Opens Edit Profile -->
                 <LinearLayout
                     android:id="@+id/profileAvatarBtn"
                     android:layout_width="44dp"
@@ -105,7 +106,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
-                android:hint="Search friends, notes, or nearby peers..."
+                android:hint="Search friends, notes, or peers..."
                 android:imeOptions="actionSearch"
                 android:inputType="text"
                 android:maxLines="1"
@@ -114,7 +115,7 @@
                 android:textSize="13sp" />
         </LinearLayout>
 
-        <!-- Instagram / Messenger-Style Active Stories & Status Row -->
+        <!-- Stories & Floating Notes Bar (Tap Circle to Post Photo/Video Story or Note!) -->
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -129,11 +130,11 @@
                 android:orientation="horizontal" />
         </HorizontalScrollView>
 
-        <!-- Compact Encrypted Mesh Status Banner -->
+        <!-- Compact Mesh Status Banner -->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="88dp"
-            android:layout_marginTop="12dp"
+            android:layout_height="84dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/bg_hero_card"
             android:paddingHorizontal="16dp"
             android:paddingVertical="12dp">
@@ -146,7 +147,7 @@
                 android:background="@drawable/bg_black_pill"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="5dp"
-                android:text="🔒 AES Shield"
+                android:text="🔒 AES + 500MB"
                 android:textColor="#FFFFFF"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -154,7 +155,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Offline Mesh Active"
+                android:text="Hybrid Mesh Active"
                 android:textColor="#0F172A"
                 android:textSize="17sp"
                 android:textStyle="bold" />
@@ -164,17 +165,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:text="●  Ready for Encrypted Peer Chats"
+                android:text="●  Ready for Calls, Stories &amp; Chats"
                 android:textColor="#1E293B"
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </RelativeLayout>
 
-        <!-- Nearby Chats Feed Header -->
+        <!-- Direct Messages Header -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="12dp"
             android:layout_marginBottom="8dp">
 
             <TextView
@@ -203,10 +204,10 @@
             android:layout_height="wrap_content"
             android:background="@drawable/bg_white_pill"
             android:gravity="center"
-            android:padding="18dp"
-            android:text="No active chat phones nearby.\nTap 'Scan Radar →' or '📷' to pair with a friend."
+            android:padding="16dp"
+            android:text="No active chat phones nearby.\nTap your Story circle above to post a Note/Photo, or tap 'Scan Radar →'."
             android:textColor="#64748B"
-            android:textSize="13sp"
+            android:textSize="12sp"
             android:visibility="gone" />
 
         <ListView
@@ -219,15 +220,15 @@
             android:scrollbars="none" />
     </LinearLayout>
 
-    <!-- ==================== PAGE B: TACTICAL BLUE RADAR ==================== -->
+    <!-- ==================== PAGE 2: RADAR + SIDE TELEMETRY (IMG-4 & IMG-5) ==================== -->
     <LinearLayout
         android:id="@+id/pageRadarContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottomNavBar"
+        android:layout_above="@+id/floatingNavWrapper"
         android:orientation="vertical"
         android:paddingHorizontal="18dp"
-        android:paddingTop="16dp"
+        android:paddingTop="14dp"
         android:visibility="gone">
 
         <TextView
@@ -240,7 +241,7 @@
             android:textSize="21sp"
             android:textStyle="bold" />
 
-        <!-- Auto vs Manual Discoverable Bar -->
+        <!-- Discoverable Auto/Manual Bar -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -292,25 +293,105 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <!-- Tactical Blue Radar Display Box + Total Connections Counter -->
+        <!-- Blue Radar Circle + Img-5 Analytic Telemetry Side Panel -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="@drawable/bg_white_pill"
-            android:gravity="center"
             android:orientation="vertical"
-            android:paddingVertical="12dp">
+            android:padding="12dp">
 
-            <com.bluewave.chat.RadarView
-                android:id="@+id/radarSonarView"
-                android:layout_width="210dp"
-                android:layout_height="210dp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.bluewave.chat.RadarView
+                    android:id="@+id/radarSonarView"
+                    android:layout_width="184dp"
+                    android:layout_height="184dp" />
+
+                <!-- Side Telemetry Panel inspired by Img-5 in Blue -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:background="#F0F9FF"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ANALYTIC RF"
+                        android:textColor="#0284C7"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/telemetryAccuracyText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="ACCURACY  ▮▮▮▮▮ 98%"
+                        android:textColor="#0369A1"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/telemetryAmplitudeText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="AMPLITUDE ▮▮▮▮ 84dB"
+                        android:textColor="#0369A1"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/telemetryPressureText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="PRESSURE  ▮▮▮▮ 5640"
+                        android:textColor="#0369A1"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/telemetryPowerText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="POWER     ▮▮▮▮▮ 30m"
+                        android:textColor="#0369A1"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="6dp"
+                        android:background="#BAE6FD" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="FREQ: 2.402 GHz\nNOISE: -92 dBm\nSHIELD: AES-256"
+                        android:textColor="#0284C7"
+                        android:textSize="9.5sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/radarTotalConnectionsText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:background="#E0F2FE"
                 android:paddingHorizontal="14dp"
@@ -321,33 +402,31 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Discovered Phones List -->
         <ListView
             android:id="@+id/deviceListView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="8dp"
             android:layout_weight="1"
             android:divider="@android:color/transparent"
             android:dividerHeight="10dp"
             android:scrollbars="none" />
 
-        <!-- Bottom Broadcast / Stop Scan Card -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
             android:background="@drawable/bg_white_pill"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="12dp">
+            android:padding="10dp">
 
             <TextView
                 android:id="@+id/statusSubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="6dp"
                 android:text="Ready to scan nearby peers"
                 android:textColor="#475569"
                 android:textSize="12sp"
@@ -356,24 +435,128 @@
             <Button
                 android:id="@+id/scanButton"
                 android:layout_width="match_parent"
-                android:layout_height="46dp"
+                android:layout_height="44dp"
                 android:background="@drawable/bg_black_pill"
                 android:text="Broadcast Signal"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
-                android:textSize="15sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
 
-    <!-- ==================== PAGE C: SETTINGS & SECURITY ==================== -->
+    <!-- ==================== PAGE 3: 7-DAY PROFILE & POST FEED (IMG-8 & IMG-10) ==================== -->
+    <LinearLayout
+        android:id="@+id/pageFeedContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/floatingNavWrapper"
+        android:orientation="vertical"
+        android:paddingHorizontal="18dp"
+        android:paddingTop="14dp"
+        android:visibility="gone">
+
+        <!-- Profile Header Card (Img-8 Style) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_white_pill"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/feedProfileAvatar"
+                android:layout_width="76dp"
+                android:layout_height="76dp"
+                android:scaleType="centerCrop" />
+
+            <TextView
+                android:id="@+id/feedProfileName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Pixel Drift"
+                android:textColor="#0F172A"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/feedProfileNoteBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="#E0F2FE"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:text="💭 Feeling wavey today!"
+                android:textColor="#0369A1"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnCreateFeedPost"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_black_pill"
+                    android:gravity="center"
+                    android:text="+ Post Photo (7-Day)"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnPostNoteShortcut"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:background="#E0F2FE"
+                    android:gravity="center"
+                    android:text="✎ Update Note"
+                    android:textColor="#0369A1"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/feedSectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp"
+            android:text="7-Day Profile Feed (Auto-Deletes After 7 Days)"
+            android:textColor="#0F172A"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <ListView
+            android:id="@+id/profilePostsListView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="12dp"
+            android:scrollbars="none" />
+    </LinearLayout>
+
+    <!-- ==================== PAGE 4: SETTINGS & THEMES ==================== -->
     <ScrollView
         android:id="@+id/pageSettingsContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottomNavBar"
+        android:layout_above="@+id/floatingNavWrapper"
         android:paddingHorizontal="18dp"
-        android:paddingTop="16dp"
+        android:paddingTop="14dp"
         android:scrollbars="none"
         android:visibility="gone">
 
@@ -392,7 +575,7 @@
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
-            <!-- Card 1: Profile & Avatar Shortcut -->
+            <!-- Profile Card -->
             <LinearLayout
                 android:id="@+id/settingsProfileCard"
                 android:layout_width="match_parent"
@@ -431,7 +614,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Tap to pick from 10 avatars or 24 nicknames"
+                        android:text="Tap to choose from 10 Img-7 avatars or 24 names"
                         android:textColor="#2563EB"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -445,7 +628,7 @@
                     android:textSize="24sp" />
             </LinearLayout>
 
-            <!-- Card 2: App Theme Switcher -->
+            <!-- 6 Instagram / Telegram App Themes -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -457,9 +640,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="App Theme"
+                    android:text="App Theme (Instagram &amp; Telegram Styles)"
                     android:textColor="#0F172A"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -471,45 +654,89 @@
                     <TextView
                         android:id="@+id/themePastelBtn"
                         android:layout_width="0dp"
-                        android:layout_height="38dp"
-                        android:layout_marginEnd="6dp"
+                        android:layout_height="36dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_black_pill"
                         android:gravity="center"
                         android:text="Pastel"
                         android:textColor="#FFFFFF"
-                        android:textSize="13sp"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/themeMintBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_white_pill"
+                        android:gravity="center"
+                        android:text="Mint Aura"
+                        android:textColor="#0F172A"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/themeTelegramBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_white_pill"
+                        android:gravity="center"
+                        android:text="Sky Blue"
+                        android:textColor="#0F172A"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/themeWhiteBtn"
                         android:layout_width="0dp"
-                        android:layout_height="38dp"
-                        android:layout_marginHorizontal="4dp"
+                        android:layout_height="36dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_white_pill"
                         android:gravity="center"
-                        android:text="White"
+                        android:text="Pure White"
                         android:textColor="#0F172A"
-                        android:textSize="13sp"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/themeMochaBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_white_pill"
+                        android:gravity="center"
+                        android:text="Mocha Dark"
+                        android:textColor="#0F172A"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/themeDarkBtn"
                         android:layout_width="0dp"
-                        android:layout_height="38dp"
+                        android:layout_height="36dp"
                         android:layout_marginStart="6dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_white_pill"
                         android:gravity="center"
-                        android:text="Dark"
+                        android:text="Midnight"
                         android:textColor="#0F172A"
-                        android:textSize="13sp"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Card 3: Radio Signal Security & Media Firewall -->
+            <!-- Radio Security & Media Firewall -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -523,16 +750,8 @@
                     android:layout_height="wrap_content"
                     android:text="🛡️ Radio Signal Security &amp; Media Guard"
                     android:textColor="#0F172A"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Encrypts RF packets and verifies JPEG/MP4/M4A file signatures to block spoofed radio payloads."
-                    android:textColor="#64748B"
-                    android:textSize="12sp" />
 
                 <Switch
                     android:id="@+id/switchRfEncryption"
@@ -540,7 +759,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:checked="true"
-                    android:text="RF Packet Encryption &amp; Checksum Guard"
+                    android:text="AES-256 RF Encryption &amp; Packet Guard"
                     android:textColor="#0F172A"
                     android:textSize="13sp" />
 
@@ -550,24 +769,24 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:checked="true"
-                    android:text="Sanitize incoming image, video &amp; audio headers"
+                    android:text="Verify JPEG/MP4/M4A file headers"
                     android:textColor="#0F172A"
                     android:textSize="13sp" />
 
                 <TextView
                     android:id="@+id/btnPrivacyPolicy"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="12dp"
+                    android:layout_height="38dp"
+                    android:layout_marginTop="10dp"
                     android:background="#E0F2FE"
                     android:gravity="center"
-                    android:text="📜  Read Privacy &amp; Radio Security Policy"
+                    android:text="📜  Privacy &amp; Radio Security Policy"
                     android:textColor="#0369A1"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Card 4: Media Channel & Bluetooth Range -->
+            <!-- High-Speed 500MB Transfer & Calling Channel -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -579,9 +798,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Media Delivery &amp; Signal Boost"
+                    android:text="Transfer &amp; Calling Channel (Up to 500 MB)"
                     android:textColor="#0F172A"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -611,7 +830,7 @@
                         android:layout_weight="1"
                         android:background="@drawable/bg_white_pill"
                         android:gravity="center"
-                        android:text="Internet / Hybrid"
+                        android:text="Internet / Hybrid 500MB"
                         android:textColor="#0F172A"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -651,7 +870,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Card 5: Auto-Delete Timer & Chat Wallpaper -->
+            <!-- Auto-Delete Chat Timer & Chat Wallpaper -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -665,7 +884,7 @@
                     android:layout_height="wrap_content"
                     android:text="Auto-Delete Chat Timer"
                     android:textColor="#0F172A"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -719,7 +938,7 @@
                     android:layout_marginTop="14dp"
                     android:text="Custom Chat Wallpaper"
                     android:textColor="#0F172A"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -768,7 +987,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Card 6: Quick Pair, Cache Wipe & Version -->
+            <!-- Quick Pair & Controls -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -792,14 +1011,14 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:checked="true"
-                    android:text="Vibrate on new offline message"
+                    android:text="Vibrate on new message or call"
                     android:textColor="#334155"
                     android:textSize="13sp" />
 
                 <TextView
                     android:id="@+id/btnQuickPairQr"
                     android:layout_width="match_parent"
-                    android:layout_height="42dp"
+                    android:layout_height="40dp"
                     android:layout_marginTop="12dp"
                     android:background="#E0F2FE"
                     android:gravity="center"
@@ -823,7 +1042,7 @@
                 <TextView
                     android:id="@+id/btnSystemBluetooth"
                     android:layout_width="match_parent"
-                    android:layout_height="42dp"
+                    android:layout_height="40dp"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_black_pill"
                     android:gravity="center"
@@ -832,17 +1051,12 @@
                     android:textSize="13sp"
                     android:textStyle="bold" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginVertical="12dp"
-                    android:background="#E2E8F0" />
-
                 <TextView
                     android:id="@+id/appVersionInfoText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Version 1.2.0 (Build 57)  •  AES-Protected Mesh"
+                    android:layout_marginTop="12dp"
+                    android:text="Version 2.0.0 (Build 58)  •  Hybrid Mesh + Voice/Video"
                     android:textColor="#475569"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -850,49 +1064,86 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- ==================== BOTTOM NAVIGATION BAR ==================== -->
+    <!-- ==================== IMG-9 TRANSLUCENT GLASS PILL NAVIGATION BAR ==================== -->
     <LinearLayout
-        android:id="@+id/bottomNavBar"
+        android:id="@+id/floatingNavWrapper"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="76dp"
         android:layout_alignParentBottom="true"
-        android:background="#F5FFFFFF"
-        android:elevation="8dp"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="14dp"
+        android:paddingBottom="10dp">
 
-        <TextView
-            android:id="@+id/tabRadarBtn"
+        <!-- Main Frosted Glass Pill Capsule -->
+        <LinearLayout
+            android:id="@+id/bottomNavBar"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="62dp"
             android:layout_weight="1"
+            android:background="@drawable/bg_glass_nav_pill"
+            android:elevation="6dp"
             android:gravity="center"
-            android:text="◉\nRadar"
-            android:textColor="#94A3B8"
-            android:textSize="12sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:padding="5dp">
 
-        <TextView
-            android:id="@+id/tabChatsBtn"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="💬\nChats"
-            android:textColor="#0F172A"
-            android:textSize="12sp"
-            android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tabRadarBtn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="📡\nRadar"
+                android:textColor="#475569"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
+            <TextView
+                android:id="@+id/tabChatsBtn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_glass_nav_active"
+                android:gravity="center"
+                android:text="💬\nChats"
+                android:textColor="#0F172A"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tabFeedBtn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="⊞\nFeed"
+                android:textColor="#475569"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tabSettingsBtn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="⚙\nSettings"
+                android:textColor="#475569"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Separate Circular Floating Search Orb (Img-9 Right Circle) -->
         <TextView
-            android:id="@+id/tabSettingsBtn"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:id="@+id/floatingSearchOrbBtn"
+            android:layout_width="58dp"
+            android:layout_height="58dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/bg_glass_nav_pill"
+            android:elevation="6dp"
             android:gravity="center"
-            android:text="⚙\nSettings"
-            android:textColor="#94A3B8"
-            android:textSize="12sp"
-            android:textStyle="bold" />
+            android:text="🔍"
+            android:textSize="20sp" />
     </LinearLayout>
 
 </RelativeLayout>
